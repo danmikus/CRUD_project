@@ -6,7 +6,7 @@ import csv
 
 
 
-def initialize(products):
+def initialize(products, path):
 
     username = getpass.getuser()
     header = '''
@@ -40,6 +40,10 @@ def initialize(products):
             print("\n")
         elif user_input == "SHOW":
             show_product(products)
+        elif user_input == "CREATE":
+            create_product(products, path)
+        else:
+            print("ERROR: Please enter a valid operation")
 
 
 new_path = '../data/products.csv'
@@ -68,13 +72,30 @@ def show_product(products):
             product = list(filter(lambda x: x["id"] == str(selection), products))
             print("\n" + product[0]["id"], "-", product[0]["name"], "-", product[0]["aisle"], "-", product[0]["department"], "-", "$" + "{0:.2f}".format(float(product[0]["price"])) + "\n")
 
+def create_product(products, path):
+
+    new_product = {}
+    print("Please enter the information for the new product:")
+    new_product["id"] = len(products) + 1
+    new_product["name"] = input("Name: ")
+    new_product["aisle"] = input("Aisle: ")
+    new_product["department"] = input("Department: ")
+    new_product["price"] = input("price: ") #TODO Add Validation
+
+    with open(path, "a") as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames = ["id", "name", "aisle", "department", "price"])
+        writer.writerow(new_product)
+
+    print("The product below has been successfully added: ")
+    print(new_product["id"], "-", new_product["name"], "-", new_product["aisle"], "-", new_product["department"], "-", "$" + "{0:.2f}".format(float(new_product["price"])) + "\n")
+
 def main():
     new_path = '../data/products.csv'
 
     with open(new_path, "r") as csv_file:
         reader = list(csv.DictReader(csv_file))
 
-    initialize(reader)
+    initialize(reader, new_path)
 
 if __name__ == "__main__":
     main()
