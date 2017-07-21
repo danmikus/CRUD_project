@@ -57,6 +57,7 @@ def list_products(products):
 def show_product(products):
 
     while True:
+
         selection = input("Please enter a product ID or type 'Back':\n>")
         if selection.upper() == "BACK":
             break
@@ -74,20 +75,44 @@ def show_product(products):
 
 def create_product(products, path):
 
-    new_product = {}
-    print("Please enter the information for the new product:")
-    new_product["id"] = len(products) + 1
-    new_product["name"] = input("Name: ")
-    new_product["aisle"] = input("Aisle: ")
-    new_product["department"] = input("Department: ")
-    new_product["price"] = input("price: ") #TODO Add Validation
+    while True:
+        with open(new_path, "r") as csv_file:
+            prod_num = len(list(csv.DictReader(csv_file)))
 
-    with open(path, "a") as csv_file:
-        writer = csv.DictWriter(csv_file, fieldnames = ["id", "name", "aisle", "department", "price"])
-        writer.writerow(new_product)
+        new_product = {}
+        print("Please enter the information for the new product:")
+        new_product["id"] = prod_num + 1
+        new_product["name"] = input("Name:\n")
+        new_product["aisle"] = input("Aisle:\n")
+        new_product["department"] = input("Department:\n")
+        while True:
+            try:
+                new_product["price"] = float(input("price:\n"))
+            except ValueError:
+                print("Error: Enter a valid price")
+                continue
+            else:
+                break
 
-    print("The product below has been successfully added: ")
-    print(new_product["id"], "-", new_product["name"], "-", new_product["aisle"], "-", new_product["department"], "-", "$" + "{0:.2f}".format(float(new_product["price"])) + "\n")
+        with open(path, "a") as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames = ["id", "name", "aisle", "department", "price"])
+            writer.writerow(new_product)
+
+        print("The product below has been successfully added: ")
+        print(new_product["id"], "-", new_product["name"], "-", new_product["aisle"], "-", new_product["department"], "-", "$" + "{0:.2f}".format(float(new_product["price"])) + "\n")
+
+        while True:
+            selection = input("Do you want to input another product? y/n:\n").upper()
+            if selection != "Y" and selection != "N":
+                print("ERROR: Invalid input")
+                continue
+            else:
+                break
+
+        if selection == "Y":
+            continue
+        else:
+            break
 
 def main():
     new_path = '../data/products.csv'
