@@ -3,12 +3,14 @@ import csv
 import collections
 
 def start_reader(path):
+    #starts csv reader
 
     with open(path, "r") as csv_file:
         reader = list(csv.DictReader(csv_file))
     return reader
 
 def initialize(path):
+    #sets up interface and "home"
 
     products = start_reader(path)
     username = getpass.getuser()
@@ -62,6 +64,7 @@ def initialize(path):
             print("ERROR: Please enter a valid operation")
 
 def check_price(price):
+    #validates price has the correct number of decimal places for create and update
 
     string_number = (str(price)).split(".")
     length = len(string_number[1])
@@ -75,6 +78,7 @@ def check_price(price):
     return inst
 
 def list_products(path):
+    #list products
 
     products = start_reader(path)
 
@@ -84,6 +88,7 @@ def list_products(path):
         print("{id} - {name} - {aisle} - {department} - ${price:.2f}".format(**row))
 
 def show_product(path):
+    #show a particular product
 
     products = start_reader(path)
 
@@ -105,6 +110,7 @@ def show_product(path):
             print("\n{id} - {name} - {aisle} - {department} - ${price:.2f}".format(**product))
 
 def create_product(path):
+    #create a new product
 
     while True:
         prod_num = len(start_reader(path))
@@ -145,6 +151,7 @@ def create_product(path):
             break
 
 def update_product(path):
+    #update an existing product
 
     while True:
         products = start_reader(path)
@@ -191,6 +198,7 @@ def update_product(path):
 
 
 def destroy_product(path):
+    #delete a product. Note that if a product is deleted, the ids are changed to keep a consistent id space
 
     while True:
         products = start_reader(path)
@@ -236,6 +244,7 @@ def destroy_product(path):
 
 
 def main():
+    #initialize script
 
     prod_path = '../data/products.csv'
     initialize(prod_path)
