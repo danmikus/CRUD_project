@@ -61,6 +61,18 @@ def initialize(path):
         else:
             print("ERROR: Please enter a valid operation")
 
+def check_price(price):
+
+    string_number = (str(price)).split(".")
+    length = len(string_number[1])
+
+    if length != 2 and string_number[1] != '0':
+        print("ERROR: If entering cents, please enter the price with two decimal places")
+        inst = True
+    else:
+        inst = False
+
+    return inst
 
 def list_products(path):
 
@@ -68,14 +80,15 @@ def list_products(path):
 
     print("\nThere are {0} products:\n".format(len(products)))
     for row in products:
-        print(row["id"], "-", row["name"], "-", row["aisle"], "-", row["department"], "-", "$" + "{0:.2f}".format(float(row["price"])))
+        row["price"] = float(row["price"])
+        print("{id} - {name} - {aisle} - {department} - ${price:.2f}".format(**row))
 
 def show_product(path):
 
     products = start_reader(path)
 
     while True:
-        selection = input("\nPlease enter a product ID or type 'Back':\n>")
+        selection = input("\nPlease enter a product ID to show or type 'Back':\n>")
         if selection.upper() == "BACK":
             break
         try:
@@ -90,7 +103,6 @@ def show_product(path):
             product = list(filter(lambda x: x["id"] == str(selection), products))[0]
             product["price"] = float(product["price"])
             print("\n{id} - {name} - {aisle} - {department} - ${price:.2f}".format(**product))
-            #print("\n" + product[0]["id"], "-", product[0]["name"], "-", product[0]["aisle"], "-", product[0]["department"], "-", "$" + "{0:.2f}".format(float(product[0]["price"])))
 
 def create_product(path):
 
@@ -105,12 +117,13 @@ def create_product(path):
         new_product["department"] = input("\nDepartment:\n>")
         while True:
             try:
-                new_product["price"] = float(input("\nprice:\n>"))
+                new_product["price"] = float(input("\nPrice:\n>"))
             except ValueError:
                 print("Error: Enter a valid price")
                 continue
             else:
-                break
+                if not check_price(new_product["price"]):
+                    break
 
         with open(path, "a") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames = ["id", "name", "aisle", "department", "price"])
@@ -122,7 +135,7 @@ def create_product(path):
         while True:
             selection = input("Do you want to input another product? y/n:\n>").upper()
             if selection != "Y" and selection != "N":
-                print("ERROR: Invalid input")
+                print("\nERROR: Invalid input")
                 continue
             else:
                 break
@@ -152,17 +165,18 @@ def update_product(path):
             ind = products.index(product)
 
             updated_product["id"] = product["id"]
-            updated_product["name"] = input("Input the product name to replace '{0}':\n>".format(product["name"]))
-            updated_product["aisle"] = input("Input the aisle to replace '{0}':\n>".format(product["aisle"]))
-            updated_product["department"] = input("Input the department to replace '{0}':\n>".format(product["department"]))
+            updated_product["name"] = input("\nInput the product name to replace '{0}':\n>".format(product["name"]))
+            updated_product["aisle"] = input("\nInput the aisle to replace '{0}':\n>".format(product["aisle"]))
+            updated_product["department"] = input("\nInput the department to replace '{0}':\n>".format(product["department"]))
             while True:
                 try:
-                    updated_product["price"] = float(input("Input the price to replace '{0}':\n>".format(product["price"])))
+                    updated_product["price"] = float(input("\nInput the price to replace '{0}':\n>".format(product["price"])))
                 except ValueError:
-                    print("Error: Enter a valid price")
+                    print("ERROR: Enter a valid price")
                     continue
                 else:
-                    break
+                    if not check_price(updated_product["price"]):
+                        break
 
             products.pop(ind)
             products.insert(ind, updated_product)
@@ -173,7 +187,7 @@ def update_product(path):
                 writer.writerows(products)
 
             print("\nThe product below has been successfully updated:")
-            print("{id} - {name} - {aisle} - {department} - ${price:.2f}".format(**updated_product)) #TODO change to truncate
+            print("{id} - {name} - {aisle} - {department} - ${price:.2f}".format(**updated_product))
 
 
 def destroy_product(path):
@@ -196,7 +210,7 @@ def destroy_product(path):
             product["price"] = float(product["price"])
 
             while True:
-                confirmation = input("Are you sure you want to delete {0}? y/n:\n>".format(product["name"])).upper()
+                confirmation = input("\nAre you sure you want to delete {0}? y/n:\n>".format(product["name"])).upper()
                 if confirmation != "Y" and confirmation != "N":
                     print("ERROR: Invalid input")
                     continue
