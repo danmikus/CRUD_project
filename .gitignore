@@ -1,2 +1,11 @@
 #DS_Store
 .DS_Store
+
+#pyc
+#*.pyc
+
+#test cache
+tests/.cache/*
+
+#pycache
+__pycache__
